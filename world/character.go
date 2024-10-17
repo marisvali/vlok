@@ -18,5 +18,10 @@ func NewCharacter() (c Character) {
 }
 
 func (c *Character) Step(w *World, input PlayerInput) {
-
+	// Move towards the food.
+	if c.Pos.DistTo(w.Food.Pos).Gt(U(3)) {
+		dir := c.Pos.To(w.Food.Pos)
+		dir.SetLen(U(1))
+		c.Pos.Add(dir)
+	}
 }

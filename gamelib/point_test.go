@@ -244,6 +244,14 @@ func TestPt_SquaredDistTo(t *testing.T) {
 	assert.Panics(t, func() { IPt(3424543543, -943242123433).SquaredDistTo(IPt(-3424543543, 943242123433)) })
 }
 
+func TestPt_DistTo(t *testing.T) {
+	assert.Equal(t, IPt(0, 0).DistTo(IPt(1, 1)), I(1))
+	assert.Equal(t, IPt(1, 1).DistTo(IPt(0, 0)), I(1))
+	assert.Equal(t, IPt(6, -8).DistTo(IPt(4, 77)), I(85))
+	assert.Equal(t, IPt(130034, 23458883).DistTo(IPt(0, 0)), I(23459243))
+	assert.Panics(t, func() { IPt(3424543543, -943242123433).DistTo(IPt(-3424543543, 943242123433)) })
+}
+
 func TestPt_SquaredLen(t *testing.T) {
 	assert.Equal(t, IPt(0, 0).SquaredLen(), I(0))
 	assert.Equal(t, IPt(1, 0).SquaredLen(), I(1))

@@ -12,6 +12,10 @@ func (p Pt) SquaredDistTo(other Pt) Int {
 	return p.To(other).SquaredLen()
 }
 
+func (p Pt) DistTo(other Pt) Int {
+	return p.To(other).Len()
+}
+
 func (p *Pt) Add(other Pt) {
 	p.X = p.X.Plus(other.X)
 	p.Y = p.Y.Plus(other.Y)
