@@ -87,7 +87,7 @@ func (g *Gui) Update() error {
 	var input PlayerInput
 	if inpututil.IsMouseButtonJustPressed(ebiten.MouseButton0) {
 		input.Move = true
-		input.MovePt = g.ScreenToWorld(g.mousePt)
+		input.MovePt = g.ScreenToWorldPos(g.mousePt)
 	}
 
 	// input = g.ai.Step(&g.world)
@@ -101,7 +101,7 @@ func (g *Gui) Update() error {
 	return nil
 }
 
-func (g *Gui) ScreenToWorld(screenPos Pt) (worldPos Pt) {
+func (g *Gui) ScreenToWorldPos(screenPos Pt) (worldPos Pt) {
 	// worldPos = (screenPos - guiMargin) * (world.Size / playSize)
 	playPos := screenPos.Minus(Pt{g.guiMargin, g.guiMargin})
 	x := playPos.X.Times(g.world.Size.X).DivBy(g.playSize.X)
@@ -110,7 +110,7 @@ func (g *Gui) ScreenToWorld(screenPos Pt) (worldPos Pt) {
 	return
 }
 
-func (g *Gui) WorldToScreen(worldPos Pt) (screenPos Pt) {
+func (g *Gui) WorldToScreenPos(worldPos Pt) (screenPos Pt) {
 	// screenPos = worldPos * (playSize / world.Size) + guiMargin
 	x := worldPos.X.Times(g.playSize.X).DivBy(g.world.Size.X)
 	y := worldPos.Y.Times(g.playSize.Y).DivBy(g.world.Size.Y)
@@ -119,10 +119,37 @@ func (g *Gui) WorldToScreen(worldPos Pt) (screenPos Pt) {
 	return
 }
 
+func (g *Gui) ScreenToWorldSize(screenSize Pt) (worldSize Pt) {
+	// worldSize = screenSize * (world.Size / playSize)
+	x := screenSize.X.Times(g.world.Size.X).DivBy(g.playSize.X)
+	y := screenSize.Y.Times(g.world.Size.Y).DivBy(g.playSize.Y)
+	worldSize = Pt{x, y}
+	return
+}
+
+func (g *Gui) WorldToScreenSize(worldSize Pt) (screenSize Pt) {
+	// screenSize = worldSize * (playSize / world.Size)
+	x := worldSize.X.Times(g.playSize.X).DivBy(g.world.Size.X)
+	y := worldSize.Y.Times(g.playSize.Y).DivBy(g.world.Size.Y)
+	screenSize = Pt{x, y}
+	return
+}
+
 func (g *Gui) DrawPlayRegion(screen *ebiten.Image) {
-	DrawSprite(screen, g.imgFood, 150, 100, 30, 30)
-	DrawSprite(screen, g.imgCharacter, 100, 100, 30, 30)
-	DrawSprite(screen, g.imgWall, 50, 50, 30, 30)
+	g.DrawWorldSprite(screen, g.imgCharacter,
+		g.world.Character.Pos, g.world.Character.Size)
+	g.DrawWorldSprite(screen, g.imgFood,
+		g.world.Food.Pos, g.world.Food.Size)
+	// DrawSprite(screen, g.imgWall, 50, 50, 30, 30)
+}
+
+func (g *Gui) DrawWorldSprite(screen *ebiten.Image, img *ebiten.Image,
+	worldPos Pt, worldSize Pt) {
+	screenPos := g.WorldToScreenPos(worldPos)
+	screenSize := g.WorldToScreenSize(worldSize)
+	DrawSprite(screen, img,
+		screenPos.X.ToFloat64(), screenPos.Y.ToFloat64(),
+		screenSize.X.ToFloat64(), screenSize.Y.ToFloat64())
 }
 
 func (g *Gui) Draw(screen *ebiten.Image) {
@@ -260,6 +287,7 @@ func main() {
 	var g Gui
 	g.username = getUsername()
 
+	g.world = NewWorld()
 	g.textHeight = I(75)
 	g.guiMargin = I(50)
 	g.buttonRegionWidth = I(200)

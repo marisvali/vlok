@@ -8,10 +8,16 @@ import (
 
 const Version = 1
 
+type Food struct {
+	Pos  Pt
+	Size Pt
+}
+
 type World struct {
-	Character Character
-	TimeStep  Int
 	Size      Pt
+	Character Character
+	Food      Food
+	TimeStep  Int
 }
 
 type PlayerInput struct {
@@ -22,9 +28,13 @@ type PlayerInput struct {
 }
 
 func NewWorld() (w World) {
-	w.Size = Pt{I(800), I(800)}
 	w.Character = NewCharacter()
-	w.Character.Pos = Pt{I(300), I(300)}
+
+	w.Size = Pt{I(800), I(800)}
+	w.Character.Size = Pt{I(50), I(50)}
+	w.Character.Pos = Pt{I(100), I(200)}
+	w.Food.Size = Pt{I(50), I(50)}
+	w.Food.Pos = Pt{I(400), I(400)}
 	return
 }
 

@@ -6,6 +6,7 @@ import (
 
 type Character struct {
 	Pos       Pt
+	Size      Pt
 	MaxHealth Int
 	Health    Int
 }
