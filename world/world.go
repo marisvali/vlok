@@ -21,10 +21,9 @@ type World struct {
 }
 
 type PlayerInput struct {
-	Move    bool
-	MovePt  Pt // tile-coordinates
-	Shoot   bool
-	ShootPt Pt // tile-coordinates
+	Position Pt
+	Pick     bool
+	Release  bool
 }
 
 func NewWorld() (w World) {
@@ -39,7 +38,20 @@ func NewWorld() (w World) {
 }
 
 func (w *World) Step(input PlayerInput) {
-	w.Character.Step(w, input)
+	if input.Pick {
+		if input.Position.DistTo(w.Character.Pos).Lt(U(50)) {
+			w.Character.Pick()
+		}
+	}
+
+	if input.Release {
+		if w.Character.IsPicked() {
+			w.Character.Release()
+		}
+	}
+
+	w.Character.Step(w, input.Position)
+
 	w.TimeStep.Inc()
 	if w.TimeStep.Eq(I(math.MaxInt64)) {
 		// Damn.

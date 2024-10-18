@@ -27,6 +27,7 @@ var embeddedFiles embed.FS
 
 type Gui struct {
 	defaultFont        font.Face
+	imgDebug           *ebiten.Image
 	imgFood            *ebiten.Image
 	imgCharacter       *ebiten.Image
 	imgWall            *ebiten.Image
@@ -80,15 +81,21 @@ func (g *Gui) UserRequestedRestartLevel() bool {
 }
 
 func (g *Gui) Update() error {
+	// Get input once, so we don't need to get it every time we need it in
+	// other functions.
+	g.justPressedKeys = g.justPressedKeys[:0]
+	g.justPressedKeys = inpututil.AppendJustPressedKeys(g.justPressedKeys)
+	x, y := ebiten.CursorPosition()
+	g.mousePt = IPt(x, y)
+
 	if g.JustPressed(ebiten.KeyX) {
 		return ebiten.Termination
 	}
 
 	var input PlayerInput
-	if inpututil.IsMouseButtonJustPressed(ebiten.MouseButton0) {
-		input.Move = true
-		input.MovePt = g.ScreenToWorldPos(g.mousePt)
-	}
+	input.Position = g.ScreenToWorldPos(g.mousePt)
+	input.Pick = inpututil.IsMouseButtonJustPressed(ebiten.MouseButton0)
+	input.Release = inpututil.IsMouseButtonJustReleased(ebiten.MouseButton0)
 
 	// input = g.ai.Step(&g.world)
 	g.world.Step(input)
@@ -119,6 +126,14 @@ func (g *Gui) WorldToScreenPos(worldPos Pt) (screenPos Pt) {
 	return
 }
 
+func (g *Gui) WorldToPlayRegionPos(worldPos Pt) (screenPos Pt) {
+	// screenPos = worldPos * (playSize / world.Size)
+	x := worldPos.X.Times(g.playSize.X).DivBy(g.world.Size.X)
+	y := worldPos.Y.Times(g.playSize.Y).DivBy(g.world.Size.Y)
+	screenPos = Pt{x, y}
+	return
+}
+
 func (g *Gui) ScreenToWorldSize(screenSize Pt) (worldSize Pt) {
 	// worldSize = screenSize * (world.Size / playSize)
 	x := screenSize.X.Times(g.world.Size.X).DivBy(g.playSize.X)
@@ -136,24 +151,33 @@ func (g *Gui) WorldToScreenSize(worldSize Pt) (screenSize Pt) {
 }
 
 func (g *Gui) DrawPlayRegion(screen *ebiten.Image) {
+	screen.Fill(color.RGBA{0, 0, 0, 255})
 	g.DrawWorldSprite(screen, g.imgCharacter,
 		g.world.Character.Pos, g.world.Character.Size)
 	g.DrawWorldSprite(screen, g.imgFood,
 		g.world.Food.Pos, g.world.Food.Size)
+
+	g.DrawWorldSprite(screen, g.imgDebug,
+		g.world.Character.Pos, UPt(1, 1))
+	mousePt := g.ScreenToWorldPos(g.mousePt)
+	g.DrawWorldSprite(screen, g.imgDebug, mousePt, UPt(1, 1))
 	// DrawSprite(screen, g.imgWall, 50, 50, 30, 30)
 }
 
+// DrawWorldSprite
+// worldPos indicates the center of img
 func (g *Gui) DrawWorldSprite(screen *ebiten.Image, img *ebiten.Image,
 	worldPos Pt, worldSize Pt) {
-	screenPos := g.WorldToScreenPos(worldPos)
-	screenSize := g.WorldToScreenSize(worldSize)
+	screenPosCenter := g.WorldToPlayRegionPos(worldPos)
+	screenSize := g.WorldToPlayRegionPos(worldSize)
+	screenPosUpperLeft := screenPosCenter.Minus(screenSize.DivBy(I(2)))
 	DrawSprite(screen, img,
-		screenPos.X.ToFloat64(), screenPos.Y.ToFloat64(),
+		screenPosUpperLeft.X.ToFloat64(), screenPosUpperLeft.Y.ToFloat64(),
 		screenSize.X.ToFloat64(), screenSize.Y.ToFloat64())
 }
 
 func (g *Gui) Draw(screen *ebiten.Image) {
-	screen.Fill(color.RGBA{0, 0, 0, 255})
+	screen.Fill(color.RGBA{200, 100, 0, 255})
 
 	{
 		upperLeft := Pt{g.guiMargin, g.guiMargin}
@@ -184,7 +208,10 @@ func (g *Gui) Draw(screen *ebiten.Image) {
 	}
 
 	// Output TPS (ticks per second, which is like frames per second).
-	ebitenutil.DebugPrint(screen, fmt.Sprintf("ActualTPS: %f", ebiten.ActualTPS()))
+	pt := g.ScreenToWorldPos(g.mousePt)
+	ebitenutil.DebugPrint(screen, fmt.Sprintf("ActualTPS: %f Mouse: %d %d Char: %d %d",
+		ebiten.ActualTPS(), pt.X.ToInt(), pt.Y.ToInt(),
+		g.world.Character.Pos.X, g.world.Character.Pos.Y))
 }
 
 func (g *Gui) DrawButtons(screen *ebiten.Image) {
@@ -271,6 +298,7 @@ func (g *Gui) loadGuiData() {
 	CheckCrashes = false
 	for {
 		CheckFailed = nil
+		g.imgDebug = g.LoadImage("data/debug.png")
 		g.imgFood = g.LoadImage("data/food.png")
 		g.imgCharacter = g.LoadImage("data/character.png")
 		g.imgWall = g.LoadImage("data/wall.png")
