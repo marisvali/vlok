@@ -29,11 +29,12 @@ type PlayerInput struct {
 func NewWorld() (w World) {
 	w.Character = NewCharacter()
 
-	w.Size = UPt(800, 800)
-	w.Character.Size = UPt(50, 50)
+	w.Size = UPt(900, 900)
+	sz := 200
+	w.Character.Size = UPt(sz, sz)
 	w.Character.Pos = UPt(100, 200)
-	w.Food.Size = UPt(50, 50)
-	w.Food.Pos = UPt(400, 400)
+	w.Food.Size = UPt(200, 200)
+	w.Food.Pos = UPt(450, 450)
 	return
 }
 

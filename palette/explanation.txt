@@ -1,0 +1,9 @@
+Extracted the top 1207 colors from the first episode of Courage the Cowardly Dog. Then extracted the top 256 colors from those.
+
+palette-rgb-3-7000-1207.txt - hex codes
+
+palette-rgb-3-7000-1207-occ.txt - line k has the number of occurences for hex code at line k in palette-rgb-3-7000-1207.txt
+
+palette-rgb-3-7000-256.png - a png from which Aseprite can extract a palette easily, contains the top 256 colors from palette-rgb-3-7000-1207.txt
+
+vlok.pal - the palette for Vlok, created from palette-rgb-3-7000-256.png using Aseprite

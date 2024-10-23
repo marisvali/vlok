@@ -30,7 +30,7 @@ type Gui struct {
 	imgDebug           *ebiten.Image
 	imgFood            *ebiten.Image
 	imgCharacter       *ebiten.Image
-	imgWall            *ebiten.Image
+	imgRoom            *ebiten.Image
 	imgTextBackground  *ebiten.Image
 	imgTextColor       *ebiten.Image
 	world              World
@@ -151,7 +151,8 @@ func (g *Gui) WorldToScreenSize(worldSize Pt) (screenSize Pt) {
 }
 
 func (g *Gui) DrawPlayRegion(screen *ebiten.Image) {
-	screen.Fill(color.RGBA{0, 0, 0, 255})
+	g.DrawWorldSprite(screen, g.imgRoom,
+		g.world.Size.DivBy(I(2)), g.world.Size)
 	g.DrawWorldSprite(screen, g.imgCharacter,
 		g.world.Character.Pos, g.world.Character.Size)
 	g.DrawWorldSprite(screen, g.imgFood,
@@ -161,7 +162,6 @@ func (g *Gui) DrawPlayRegion(screen *ebiten.Image) {
 		g.world.Character.Pos, UPt(1, 1))
 	mousePt := g.ScreenToWorldPos(g.mousePt)
 	g.DrawWorldSprite(screen, g.imgDebug, mousePt, UPt(1, 1))
-	// DrawSprite(screen, g.imgWall, 50, 50, 30, 30)
 }
 
 // DrawWorldSprite
@@ -177,7 +177,7 @@ func (g *Gui) DrawWorldSprite(screen *ebiten.Image, img *ebiten.Image,
 }
 
 func (g *Gui) Draw(screen *ebiten.Image) {
-	screen.Fill(color.RGBA{200, 100, 0, 255})
+	screen.Fill(color.RGBA{0, 0, 0, 255})
 
 	{
 		upperLeft := Pt{g.guiMargin, g.guiMargin}
@@ -301,7 +301,7 @@ func (g *Gui) loadGuiData() {
 		g.imgDebug = g.LoadImage("data/debug.png")
 		g.imgFood = g.LoadImage("data/food.png")
 		g.imgCharacter = g.LoadImage("data/character.png")
-		g.imgWall = g.LoadImage("data/wall.png")
+		g.imgRoom = g.LoadImage("data/room.png")
 		g.imgTextBackground = g.LoadImage("data/text-background.png")
 		g.imgTextColor = g.LoadImage("data/text-color.png")
 		if CheckFailed == nil {
@@ -317,9 +317,9 @@ func main() {
 
 	g.world = NewWorld()
 	g.textHeight = I(75)
-	g.guiMargin = I(50)
+	g.guiMargin = I(30)
 	g.buttonRegionWidth = I(200)
-	g.playSize = Pt{I(800), I(800)}
+	g.playSize = Pt{I(900), I(900)}
 	windowSize := g.playSize
 	windowSize.Add(Pt{g.guiMargin.Times(TWO), g.guiMargin})
 	windowSize.Y.Add(g.textHeight)
