@@ -96,6 +96,11 @@ func (g *Gui) Update() error {
 	input.Position = g.ScreenToWorldPos(g.mousePt)
 	input.Pick = inpututil.IsMouseButtonJustPressed(ebiten.MouseButton0)
 	input.Release = inpututil.IsMouseButtonJustReleased(ebiten.MouseButton0)
+	input.MoveLeft = g.JustPressed(ebiten.Key1)
+	input.MoveRight = g.JustPressed(ebiten.Key2)
+	input.MoveUp = g.JustPressed(ebiten.Key3)
+	input.MoveDown = g.JustPressed(ebiten.Key4)
+	input.MoveToFood = g.JustPressed(ebiten.KeyF)
 
 	// input = g.ai.Step(&g.world)
 	g.world.Step(input)
