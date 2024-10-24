@@ -10,8 +10,8 @@ type Character struct {
 	MaxHealth Int
 	Health    Int
 	Picked    bool
-	State     CharacterState
 	Speed     Int
+	Ai        Ai
 }
 
 func NewCharacter() (c Character) {
@@ -21,17 +21,7 @@ func NewCharacter() (c Character) {
 	return
 }
 
-type CharacterState int
-
-const (
-	MoveToFood CharacterState = iota
-	MoveLeft
-	MoveRight
-	MoveUp
-	MoveDown
-)
-
-func (c *Character) MoveToFood(w *World, playerPos Pt) {
+func (c *Character) MoveToFood(w *World) {
 	if c.Pos.DistTo(w.Food.Pos).Gt(U(3)) {
 		dir := c.Pos.To(w.Food.Pos)
 		dir.SetLen(c.Speed)
@@ -39,50 +29,35 @@ func (c *Character) MoveToFood(w *World, playerPos Pt) {
 	}
 }
 
-func (c *Character) MoveLeft(w *World, playerPos Pt) {
+func (c *Character) MoveLeft(w *World) {
 	dir := UPt(-1, 0)
 	dir.SetLen(c.Speed)
 	c.Pos.Add(dir)
 }
 
-func (c *Character) MoveRight(w *World, playerPos Pt) {
+func (c *Character) MoveRight(w *World) {
 	dir := UPt(1, 0)
 	dir.SetLen(c.Speed)
 	c.Pos.Add(dir)
 }
 
-func (c *Character) MoveUp(w *World, playerPos Pt) {
+func (c *Character) MoveUp(w *World) {
 	dir := UPt(0, -1)
 	dir.SetLen(c.Speed)
 	c.Pos.Add(dir)
 }
 
-func (c *Character) MoveDown(w *World, playerPos Pt) {
+func (c *Character) MoveDown(w *World) {
 	dir := UPt(0, 1)
 	dir.SetLen(c.Speed)
 	c.Pos.Add(dir)
 }
 
-func (c *Character) Move(w *World, playerPos Pt) {
-	switch c.State {
-	case MoveToFood:
-		c.MoveToFood(w, playerPos)
-	case MoveLeft:
-		c.MoveLeft(w, playerPos)
-	case MoveRight:
-		c.MoveRight(w, playerPos)
-	case MoveUp:
-		c.MoveUp(w, playerPos)
-	case MoveDown:
-		c.MoveDown(w, playerPos)
-	}
-}
-
-func (c *Character) Step(w *World, playerPos Pt) {
+func (c *Character) Step(w *World, input PlayerInput) {
 	if c.Picked {
-		c.Pos = playerPos
+		c.Pos = input.Position
 	} else {
-		c.Move(w, playerPos)
+		c.Ai.Step(w, c, input)
 	}
 }
 

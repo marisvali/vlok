@@ -56,27 +56,7 @@ func (w *World) Step(input PlayerInput) {
 		}
 	}
 
-	if input.MoveLeft {
-		w.Character.State = MoveLeft
-	}
-
-	if input.MoveRight {
-		w.Character.State = MoveRight
-	}
-
-	if input.MoveUp {
-		w.Character.State = MoveUp
-	}
-
-	if input.MoveDown {
-		w.Character.State = MoveDown
-	}
-
-	if input.MoveToFood {
-		w.Character.State = MoveToFood
-	}
-
-	w.Character.Step(w, input.Position)
+	w.Character.Step(w, input)
 
 	w.TimeStep.Inc()
 	if w.TimeStep.Eq(I(math.MaxInt64)) {
