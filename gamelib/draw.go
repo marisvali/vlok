@@ -127,6 +127,19 @@ func DrawFilledRect(screen *ebiten.Image, r Rectangle, col color.Color) {
 	screen.DrawImage(img, op)
 }
 
+func DrawRect(screen *ebiten.Image, r Rectangle, col color.Color) {
+	// rect corners
+	upperLeftCorner := Pt{Min(r.Corner1.X, r.Corner2.X), Min(r.Corner1.Y, r.Corner2.Y)}
+	lowerLeftCorner := Pt{Min(r.Corner1.X, r.Corner2.X), Max(r.Corner1.Y, r.Corner2.Y)}
+	upperRightCorner := Pt{Max(r.Corner1.X, r.Corner2.X), Min(r.Corner1.Y, r.Corner2.Y)}
+	lowerRightCorner := Pt{Max(r.Corner1.X, r.Corner2.X), Max(r.Corner1.Y, r.Corner2.Y)}
+
+	DrawLine(screen, Line{upperLeftCorner, upperRightCorner}, col)
+	DrawLine(screen, Line{upperLeftCorner, lowerLeftCorner}, col)
+	DrawLine(screen, Line{lowerLeftCorner, lowerRightCorner}, col)
+	DrawLine(screen, Line{lowerRightCorner, upperRightCorner}, col)
+}
+
 func DrawFilledSquare(screen *ebiten.Image, s Square, col color.Color) {
 	img := ebiten.NewImage(s.Size.ToInt(), s.Size.ToInt())
 	img.Fill(col)

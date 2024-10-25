@@ -39,12 +39,12 @@ func (a *Ai) Step(w *World, c *Character, input PlayerInput) {
 	case MoveToFood:
 		c.MoveToFood(w)
 	case MoveLeft:
-		c.MoveLeft(w)
+		c.MoveLeft()
 	case MoveRight:
-		c.MoveRight(w)
+		c.MoveRight()
 	case MoveUp:
-		c.MoveUp(w)
+		c.MoveUp()
 	case MoveDown:
-		c.MoveDown(w)
+		c.MoveDown()
 	}
 }

@@ -155,9 +155,16 @@ func (g *Gui) WorldToScreenSize(worldSize Pt) (screenSize Pt) {
 	return
 }
 
+func (g *Gui) DrawRect(screen *ebiten.Image, r Rectangle, col color.Color) {
+	c1 := g.WorldToPlayRegionPos(r.Corner1)
+	c2 := g.WorldToPlayRegionPos(r.Corner2)
+	DrawRect(screen, Rectangle{c1, c2}, col)
+}
+
 func (g *Gui) DrawPlayRegion(screen *ebiten.Image) {
 	g.DrawWorldSprite(screen, g.imgRoom,
 		g.world.Size.DivBy(I(2)), g.world.Size)
+	// g.DrawRect(screen, g.world.Character.MoveLimits, color.RGBA{255, 0, 0, 255})
 	g.DrawWorldSprite(screen, g.imgCharacter,
 		g.world.Character.Pos, g.world.Character.Size)
 	g.DrawWorldSprite(screen, g.imgFood,

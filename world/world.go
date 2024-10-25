@@ -45,7 +45,7 @@ func NewWorld() (w World) {
 
 func (w *World) Step(input PlayerInput) {
 	if input.Pick {
-		if input.Position.DistTo(w.Character.Pos).Lt(U(50)) {
+		if input.Position.DistTo(w.Character.Pos).Lt(U(150)) {
 			w.Character.Pick()
 		}
 	}
